@@ -1,0 +1,62 @@
+services:
+  apigateway:
+    container_name: go-grpc-api-gateway
+    image: go-grpc-api-gateway
+    build:
+      context: ./go-grpc-api-gateway
+    depends_on:
+      - postgres
+    ports:
+      - 3000:3000
+  authsvc:
+    container_name: go-grpc-auth-svc
+    image: go-grpc-auth-svc
+    build:
+      context: ./go-grpc-auth-svc
+    depends_on:
+      - postgres
+    ports:
+      - 3001:3001
+  ordersvc:
+    container_name: go-grpc-order-svc
+    image: go-grpc-order-svc
+    build:
+      context: ./go-grpc-order-svc
+    depends_on:
+      - postgres
+    ports:
+      - 3002:3002
+  productsvc:
+    container_name: go-grpc-product-svc
+    image: go-grpc-product-svc
+    build:
+      context: ./go-grpc-product-svc
+    depends_on:
+      - postgres
+    ports:
+      - 3003:3003
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: always
+    user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./postgres:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_MULTIPLE_DATABASES=order_svc,product_svc,auth_svc
+    ports:
+      - 5433:5432
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+
+volumes:
+  db-data:
